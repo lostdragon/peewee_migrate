@@ -1,4 +1,4 @@
-from peewee_migrate.cli import cli
+from .cli import cli
 
 
 cli()  # noqa

@@ -139,15 +139,19 @@ def diff_many(models1, models2, migrator=None, reverse=False):
 
 def model_to_code(Model, **kwargs):
     template = """class {classname}(pw.Model):
+    class Meta:
+        db_table = '{db_table}'
 {fields}
 """
+
     fields = INDENT + NEWLINE.join([
         field_to_code(field, **kwargs) for field in Model._meta.sorted_fields
         if not (isinstance(field, pw.PrimaryKeyField) and field.name == 'id')
     ])
     return template.format(
         classname=Model.__name__,
-        fields=fields
+        fields=fields,
+        db_table=Model._meta.db_table
     )
 
 

@@ -6,7 +6,7 @@ import sys
 import click
 from playhouse.db_url import connect
 
-from peewee_migrate.compat import string_types
+from .compat import string_types
 
 
 VERBOSE = ['WARNING', 'INFO', 'DEBUG', 'NOTSET']
@@ -14,9 +14,9 @@ CLEAN_RE = re.compile(r'\s+$', re.M)
 
 
 def get_router(directory, database, verbose=0):
-    from peewee_migrate import LOGGER
-    from peewee_migrate.compat import exec_in
-    from peewee_migrate.router import Router
+    from . import LOGGER
+    from .compat import exec_in
+    from .router import Router
 
     logging_level = VERBOSE[verbose]
     config = {}

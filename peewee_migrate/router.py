@@ -7,24 +7,22 @@ import mock
 import peewee as pw
 from cached_property import cached_property
 
-from peewee_migrate import LOGGER, MigrateHistory
-from peewee_migrate.auto import diff_many, NEWLINE
-from peewee_migrate.compat import string_types, exec_in
-from peewee_migrate.migrator import Migrator
-
+from . import LOGGER, MigrateHistory
+from .auto import diff_many, NEWLINE
+from .compat import string_types, exec_in
+from .migrator import Migrator
 
 CLEAN_RE = re.compile(r'\s+$', re.M)
 MIGRATE_DIR = os.path.join(os.getcwd(), 'migrations')
-VOID = lambda m, d: None # noqa
+VOID = lambda m, d: None  # noqa
 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'template.txt')) as t:
     MIGRATE_TEMPLATE = t.read()
 
 
 class BaseRouter(object):
-
     """Abstract base class for router."""
 
-    def __init__(self, database, migrate_table='migratehistory', logger=LOGGER):
+    def __init__(self, database, migrate_table='migrate_history', logger=LOGGER):
         self.database = database
         self.migrate_table = migrate_table
         self.logger = logger
@@ -176,12 +174,15 @@ class BaseRouter(object):
 
 
 class Router(BaseRouter):
-
     filemask = re.compile(r"[\d]{3}_[^\.]+\.py$")
 
-    def __init__(self, database, migrate_dir=MIGRATE_DIR, **kwargs):
+    def __init__(self, database, migrate_dir=MIGRATE_DIR, base_model=None, **kwargs):
         super(Router, self).__init__(database, **kwargs)
         self.migrate_dir = migrate_dir
+        if base_model is None:
+            self.base_model = 'peewee'
+        else:
+            self.base_model = base_model
 
     @property
     def todo(self):
@@ -199,7 +200,7 @@ class Router(BaseRouter):
         name = prefix + name + '.py'
         path = os.path.join(self.migrate_dir, name)
         with open(path, 'w') as f:
-            f.write(MIGRATE_TEMPLATE.format(migrate=migrate, rollback=rollback))
+            f.write(MIGRATE_TEMPLATE.format(base_model=self.base_model, migrate=migrate, rollback=rollback))
 
         return path
 
@@ -213,7 +214,6 @@ class Router(BaseRouter):
 
 
 class ModuleRouter(BaseRouter):
-
     def __init__(self, database, migrate_module='migrations', **kwargs):
         super(ModuleRouter, self).__init__(database, **kwargs)
 

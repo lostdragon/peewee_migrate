@@ -7,7 +7,7 @@ from playhouse.migrate import (
     Operation, SQL, Entity, Clause, PostgresqlDatabase, operation, SqliteDatabase, MySQLDatabase
 )
 
-from peewee_migrate import LOGGER
+from . import LOGGER
 
 
 class SchemaMigrator(ScM):

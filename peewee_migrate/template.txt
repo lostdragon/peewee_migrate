@@ -20,7 +20,7 @@
 """
 
 import datetime as dt
-import peewee as pw
+import {base_model} as pw
 
 
 def migrate(migrator, database, fake=False, **kwargs):
