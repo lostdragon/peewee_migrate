@@ -74,9 +74,11 @@ class MySQLMigrator(SchemaMigrator, MqM):
 
     def alter_change_column(self, table, column_name, field):
         """Support change columns."""
-        clause = super(MySQLMigrator, self).alter_change_column(table, column_name, field)
-        field_clause = clause.nodes[-1]
-        field_clause.nodes.insert(1, SQL('TYPE'))
+        field_null, field.null = field.null, True
+        field_clause = self.database.compiler().field_definition(field)
+        field.null = field_null
+        clause = Clause(SQL('ALTER TABLE'), Entity(table), SQL('MODIFY COLUMN'), field_clause)
+
         return clause
 
 
